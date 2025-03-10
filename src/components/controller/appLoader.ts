@@ -11,3 +11,4 @@ export default class AppLoader extends Loader {
         super.getResp<T>(params, callback);
     }
 }
+

@@ -1,10 +1,12 @@
 const path = require('path');
 
 module.exports = {
-  devServer: {
-    contentBase: path.join(__dirname, 'dist'),
-    compress: true,
-    open: true,
-    port: 3000,
-  },
+    mode: 'development',
+    devtool: 'inline-source-map',
+    devServer: {
+        static: path.resolve(__dirname, './dist'),
+        port: 3000,
+        open: true,
+        hot: true,
+    },
 };
