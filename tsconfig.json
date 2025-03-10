@@ -1,15 +1,15 @@
 {
    "compilerOptions": {
-       "target": "ES6",
-       "module": "ESNext",
-       "moduleResolution": "Node",
-       "strict": true,
-       "esModuleInterop": true,
-       "skipLibCheck": true,
-       "allowJs": true,
-       "checkJs": true,
-       "noImplicitAny": true,
-       "outDir": "./dist"
+     "target": "es5",
+     "module": "commonjs",
+     "strict": true,
+     "esModuleInterop": true,
+     "skipLibCheck": true,
+     "forceConsistentCasingInFileNames": true,
+     "allowJs": false
    },
-   "include": ["src/**/*"]
-}
+   "exclude": [
+     "node_modules"
+   ]
+ }
+ 

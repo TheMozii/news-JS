@@ -1,46 +1,45 @@
-class Loader {
-    constructor(baseLink, options) {
+import { HttpMethod, LoaderOptions, Endpoints } from '../../types';
+
+export default class Loader {
+    protected baseLink: string;
+    protected options: Readonly<LoaderOptions>;
+
+    constructor(baseLink: string, options: LoaderOptions) {
         this.baseLink = baseLink;
         this.options = options;
     }
 
-    getResp(
-        { endpoint, options = {} },
-        callback = () => {
-            console.error('No callback for GET response');
-        }
-    ) {
-        this.load('GET', endpoint, callback, options);
+    public getResp<T>(params: { endpoint: Endpoints; options?: LoaderOptions }, callback: (data: T) => void): void {
+        this.load<T>('GET', params.endpoint, callback, params.options);
     }
 
-    errorHandler(res) {
+    private errorHandler(res: Response): Response {
         if (!res.ok) {
-            if (res.status === 401 || res.status === 404)
-                console.log(`Sorry, but there is ${res.status} error: ${res.statusText}`);
-            throw Error(res.statusText);
+            console.error(`Sorry, but there is ${res.status} error: ${res.statusText}`);
+            throw new Error(res.statusText);
         }
-
         return res;
     }
 
-    makeUrl(options, endpoint) {
-        const urlOptions = { ...this.options, ...options };
+    private makeUrl(options: LoaderOptions = {}, endpoint: string): string {
+        const urlOptions: LoaderOptions = { ...this.options, ...options };
         let url = `${this.baseLink}${endpoint}?`;
-
         Object.keys(urlOptions).forEach((key) => {
             url += `${key}=${urlOptions[key]}&`;
         });
-
         return url.slice(0, -1);
     }
 
-    load(method, endpoint, callback, options = {}) {
+    private load<T>(
+        method: HttpMethod,
+        endpoint: string,
+        callback: (data: T) => void,
+        options: LoaderOptions = {}
+    ): void {
         fetch(this.makeUrl(options, endpoint), { method })
             .then(this.errorHandler)
             .then((res) => res.json())
-            .then((data) => callback(data))
+            .then((data: T) => callback(data))
             .catch((err) => console.error(err));
     }
 }
-
-export default Loader;

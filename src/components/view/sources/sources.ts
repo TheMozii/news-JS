@@ -1,21 +1,34 @@
+import { Source } from '../../../types';
 import './sources.css';
 
-class Sources {
-    draw(data) {
+export default class Sources {
+    public draw(data: ReadonlyArray<Source>): void {
         const fragment = document.createDocumentFragment();
-        const sourceItemTemp = document.querySelector('#sourceItemTemp');
+        const sourceItemTemp = document.querySelector<HTMLTemplateElement>('#sourceItemTemp');
 
-        data.forEach((item) => {
-            const sourceClone = sourceItemTemp.content.cloneNode(true);
+        if (!sourceItemTemp) {
+            console.error('Template element #sourceItemTemp not found');
+            return;
+        }
 
-            sourceClone.querySelector('.source__item-name').textContent = item.name;
-            sourceClone.querySelector('.source__item').setAttribute('data-source-id', item.id);
+        data.forEach((item: Source) => {
+            const sourceClone = sourceItemTemp.content.cloneNode(true) as DocumentFragment;
+            const sourceItemName = sourceClone.querySelector('.source__item-name');
+            const sourceItem = sourceClone.querySelector('.source__item');
+
+            if (sourceItemName && sourceItem) {
+                sourceItemName.textContent = item.name;
+                sourceItem.setAttribute('data-source-id', item.id);
+            }
 
             fragment.append(sourceClone);
         });
 
-        document.querySelector('.sources').append(fragment);
+        const sourcesContainer = document.querySelector('.sources');
+        if (sourcesContainer) {
+            sourcesContainer.append(fragment);
+        } else {
+            console.error('Container .sources not found');
+        }
     }
 }
-
-export default Sources;

@@ -1,39 +1,41 @@
 import AppLoader from './appLoader';
+import { Endpoints, NewsResponse, LoaderOptions, SourcesResponse } from '../../types';
 
-class AppController extends AppLoader {
-    getSources(callback:) {
-        super.getResp(
-            {
-                endpoint: 'sources',
-            },
-            callback
-        );
+export default class AppController extends AppLoader {
+    public getSources(callback: (data: SourcesResponse) => void): void {
+        this.getResp({ endpoint: Endpoints.Sources }, callback);
     }
 
-    getNews(e, callback) {
-        let target = e.target;
-        const newsContainer = e.currentTarget;
+    public getNews(e: Event, callback: (data: NewsResponse) => void): void {
+        let target = e.target as HTMLElement;
+        const newsContainer = e.currentTarget as HTMLElement;
 
-        while (target !== newsContainer) {
+        while (target !== newsContainer && target !== null) {
             if (target.classList.contains('source__item')) {
-                const sourceId = target.getAttribute('data-source-id');
+                const sourceId = target.getAttribute('data-source-id') || '';
                 if (newsContainer.getAttribute('data-source') !== sourceId) {
                     newsContainer.setAttribute('data-source', sourceId);
-                    super.getResp(
-                        {
-                            endpoint: 'everything',
-                            options: {
-                                sources: sourceId,
-                            },
-                        },
-                        callback
-                    );
+
+                    const query = target.getAttribute('data-query') || sourceId;
+                    const from = target.getAttribute('data-from');
+                    const to = target.getAttribute('data-to');
+                    const sortBy = target.getAttribute('data-sortby');
+                    const country = target.getAttribute('data-country');
+                    const category = target.getAttribute('data-category');
+                    const endpointAttr = target.getAttribute('data-endpoint') || Endpoints.Everything;
+
+                    const options: LoaderOptions = { q: query };
+                    if (from) options.from = from;
+                    if (to) options.to = to;
+                    if (sortBy) options.sortBy = sortBy;
+                    if (country) options.country = country;
+                    if (category) options.category = category;
+
+                    this.getResp<NewsResponse>({ endpoint: endpointAttr as Endpoints, options }, callback);
                 }
                 return;
             }
-            target = target.parentNode;
+            target = target.parentNode as HTMLElement;
         }
     }
 }
-
-export default AppController;
